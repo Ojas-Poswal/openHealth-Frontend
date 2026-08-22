@@ -1,13 +1,29 @@
-import {useState} from "react"
+import {use, useState} from "react"
+import {useNavigate} from "react-router-dom"
+import api from "../api/axios.js"
 
 function Login() {
     const [email,setEmail] = useState("");
     const [password,setPassword] = useState("")
-    const handleSubmit = (e) => {
+    const navigate = useNavigate()
+    const handleSubmit = async (e) => {
          e.preventDefault();
 
-         console.log(email);
-         console.log(password);
+        try{
+          const response = await api.post("/patients/login",{
+            email,password
+          });
+          localStorage.setItem(
+            "token",
+            response.data.token
+          )
+
+          navigate("/dashboard")
+        }catch(error){
+          console.error(error)
+        }
+
+
     };
   return (
     <div className="min-h-screen flex items-center justify-center">

@@ -142,3 +142,35 @@ Updated UI
 Outcome:
 
 Login form inputs are now controlled by React state and can be accessed during form submission.
+
+## Bug
+
+Error:
+
+Login request failed with:
+
+Access to XMLHttpRequest has been blocked by CORS policy
+
+Cause:
+
+Frontend was running on:
+
+http://localhost:5173
+
+while backend was running on:
+
+http://localhost:8000
+
+The backend did not allow requests from a different origin.
+
+Fix:
+
+Installed CORS middleware and enabled it in Express.
+
+import cors from "cors";
+
+app.use(cors());
+
+Lesson:
+
+When frontend and backend run on different origins, CORS must be configured to allow browser communication.

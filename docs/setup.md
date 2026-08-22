@@ -150,3 +150,138 @@ const handleSubmit = (e) => {
 Outcome:
 
 Login form now follows standard React form handling practices and is ready for backend API integration.
+
+## Axios Configuration
+
+File Created:
+
+- src/api/axios.js
+
+Implementation:
+
+import axios from "axios";
+
+const api = axios.create({
+    baseURL: "http://localhost:8000/api/v1"
+});
+
+export default api;
+
+Purpose:
+
+Centralizes backend API communication and avoids repeating the backend URL across the application.
+
+Benefits:
+
+- Cleaner API calls
+- Easier environment configuration
+- Single source of truth for backend endpoints
+
+Outcome:
+
+Frontend is configured to communicate with the OpenHealth backend.
+
+## Patient Login API Integration
+
+Endpoint:
+
+POST /api/v1/patients/login
+
+Request Body:
+
+{
+    "email": "patient@example.com",
+    "password": "password123"
+}
+
+Flow:
+
+Patient Credentials
+↓
+React State
+↓
+Axios POST Request
+↓
+Backend Authentication
+↓
+JWT Generation
+↓
+Success Response
+
+Implementation:
+
+const response = await api.post(
+    "/patients/login",
+    {
+        email,
+        password
+    }
+);
+
+Verification:
+
+Successfully received:
+
+{
+    "message": "Login Successful",
+    "token": "..."
+}
+
+Outcome:
+
+Patient frontend successfully communicates with the backend authentication system and receives a JWT token upon successful login.
+
+## JWT Storage
+
+Purpose:
+
+Stores the authentication token on the client after successful login.
+
+Implementation:
+
+localStorage.setItem(
+    "token",
+    response.data.token
+);
+
+Benefits:
+
+- Persists authentication across page refreshes
+- Enables access to protected APIs
+- Eliminates repeated logins during a session
+
+Flow:
+
+Login Success
+↓
+JWT Received
+↓
+localStorage
+↓
+Future Authenticated Requests
+
+Outcome:
+
+Patient JWT is securely stored in the browser and available for future authenticated API requests.
+
+## Dashboard Navigation
+
+Purpose:
+
+Redirect authenticated patients to the dashboard immediately after login.
+
+Implementation:
+
+navigate("/dashboard");
+
+Flow:
+
+Login Success
+↓
+Store JWT
+↓
+Navigate Dashboard
+
+Outcome:
+
+Patients are automatically redirected to the dashboard after successful authentication, improving user experience.
