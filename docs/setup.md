@@ -335,3 +335,27 @@ Automatically redirected to:
 Outcome:
 
 Unauthenticated users cannot access protected pages while authenticated users retain access.
+
+## Patient Logout
+
+Purpose:
+
+Ends the authenticated session.
+
+Implementation:
+
+localStorage.removeItem("token");
+
+navigate("/");
+
+Flow:
+
+Logout
+↓
+Remove JWT
+↓
+Redirect Login
+
+Outcome:
+
+Patients can securely terminate their session and lose access to protected routes.
