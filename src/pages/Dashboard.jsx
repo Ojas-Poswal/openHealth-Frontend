@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom"
 import {useState,useEffect} from "react"
 import api from "../api/axios"
+import MedicalCaseCard from "../components/MedicalCaseCard";
+
 function Dashboard(){
     const navigate = useNavigate();
     const [medicalCases,setMedicalCases] = useState([])
@@ -27,7 +29,7 @@ function Dashboard(){
                 }
             }
           )
-          console.log(response.data)
+          setMedicalCases(response.data.medicalCases)
         }catch(error){
             console.error(error)
         }
@@ -36,6 +38,13 @@ function Dashboard(){
     return (
         <>
           <h1>Dashboard Page</h1>
+
+          {medicalCases.map((medicalCase) => (
+            <MedicalCaseCard 
+              key={medicalCase._id}  
+              medicalCase={medicalCase}
+            />
+          ))}
 
           <button onClick = {handleLogout}>
             Logout

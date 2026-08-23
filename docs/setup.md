@@ -359,6 +359,43 @@ Redirect Login
 Outcome:
 
 Patients can securely terminate their session and lose access to protected routes.
+## React Side Effects (useEffect)
+
+Concept:
+
+useEffect()
+
+Purpose:
+
+Runs code after a component renders.
+
+Implementation:
+
+useEffect(() => {
+    fetchMedicalCases();
+}, []);
+
+Explanation:
+
+The empty dependency array:
+
+[]
+
+tells React to execute the effect only when the component first loads.
+
+Flow:
+
+Dashboard Loads
+↓
+useEffect Executes
+↓
+fetchMedicalCases()
+↓
+API Request Sent
+
+Outcome:
+
+Medical cases are automatically fetched when the dashboard opens without requiring user interaction.
 
 ## Dashboard Medical Case Retrieval
 
@@ -370,7 +407,13 @@ Authentication:
 
 Bearer JWT
 
+Purpose:
+
+Retrieve all medical cases belonging to the currently authenticated patient.
+
 Implementation:
+
+const token = localStorage.getItem("token");
 
 const response = await api.get(
     "/medical-case/my-cases",
@@ -380,6 +423,20 @@ const response = await api.get(
         }
     }
 );
+
+Code Explanation:
+
+localStorage.getItem("token")
+→ Retrieves the JWT stored after login.
+
+Authorization Header
+→ Sends the JWT to the backend for authentication.
+
+api.get(...)
+→ Sends a GET request to fetch the patient's medical cases.
+
+response.data
+→ Contains the backend response including the medical cases array.
 
 Flow:
 
@@ -405,3 +462,145 @@ Successfully retrieved:
 Outcome:
 
 Dashboard successfully retrieves medical cases belonging to the authenticated patient.
+
+## React State Update From API Response
+
+Concept:
+
+useState()
+
+Purpose:
+
+Store backend data inside the component and trigger UI updates.
+
+Implementation:
+
+setMedicalCases(
+    response.data.medicalCases
+);
+
+Code Explanation:
+
+response.data.medicalCases
+→ Extracts the medical cases array from the backend response.
+
+setMedicalCases(...)
+→ Updates React state.
+
+React automatically re-renders the component after the state changes.
+
+Flow:
+
+API Response Received
+↓
+Extract Medical Cases
+↓
+Update State
+↓
+Component Re-renders
+
+Outcome:
+
+Medical case data is now available inside the dashboard component and ready for display.
+
+## Medical Case Card Component
+
+Component:
+
+MedicalCaseCard.jsx
+
+Purpose:
+
+Displays information about a single medical case.
+
+Props:
+
+medicalCase
+
+Implementation:
+
+function MedicalCaseCard({ medicalCase }) {
+    return (
+        <div>
+            <h2>{medicalCase.diagnosis}</h2>
+            <p>{medicalCase.verdict}</p>
+        </div>
+    );
+}
+
+Code Explanation:
+
+Props
+→ Allow data to be passed from a parent component to a child component.
+
+medicalCase
+→ Represents one medical case object from the medicalCases array.
+
+medicalCase.diagnosis
+→ Displays the diagnosis field.
+
+medicalCase.verdict
+→ Displays the verdict field.
+
+Flow:
+
+Dashboard
+↓
+medicalCases Array
+↓
+map()
+↓
+MedicalCaseCard
+↓
+Display Case Information
+
+Outcome:
+
+Medical case information is now displayed through a reusable React component.
+
+## Dynamic List Rendering
+
+Concept:
+
+Array.map()
+
+Purpose:
+
+Render multiple UI elements from an array of data.
+
+Implementation:
+
+{medicalCases.map((medicalCase) => (
+    <MedicalCaseCard
+        key={medicalCase._id}
+        medicalCase={medicalCase}
+    />
+))}
+
+Code Explanation:
+
+medicalCases
+→ Array containing all patient medical cases.
+
+map()
+→ Iterates through each medical case.
+
+key
+→ Unique identifier used by React to efficiently update lists.
+
+medicalCase Prop
+→ Passes the current medical case to the component.
+
+Flow:
+
+Medical Cases Array
+↓
+map()
+↓
+Create Component For Each Case
+↓
+Render UI
+
+Outcome:
+
+All patient medical cases are rendered dynamically from backend data.
