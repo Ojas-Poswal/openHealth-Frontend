@@ -359,3 +359,49 @@ Redirect Login
 Outcome:
 
 Patients can securely terminate their session and lose access to protected routes.
+
+## Dashboard Medical Case Retrieval
+
+Endpoint:
+
+GET /api/v1/medical-case/my-cases
+
+Authentication:
+
+Bearer JWT
+
+Implementation:
+
+const response = await api.get(
+    "/medical-case/my-cases",
+    {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
+
+Flow:
+
+Dashboard Load
+↓
+Retrieve JWT
+↓
+Send Authenticated Request
+↓
+Backend Verification
+↓
+Medical Cases Returned
+
+Verification:
+
+Successfully retrieved:
+
+{
+    message: "Medical cases fetched successfully",
+    medicalCases: [...]
+}
+
+Outcome:
+
+Dashboard successfully retrieves medical cases belonging to the authenticated patient.

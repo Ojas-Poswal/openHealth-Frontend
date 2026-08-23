@@ -198,3 +198,27 @@ import { Navigate } from "react-router-dom";
 Lesson:
 
 Navigate is a React Router component used for redirection. The navigate function is obtained through the useNavigate() hook.
+
+## Bug
+
+Observation:
+
+Medical cases were fetched twice and appeared twice in the browser console.
+
+Cause:
+
+React StrictMode was enabled in development mode.
+
+<React.StrictMode>
+    <App />
+</React.StrictMode>
+
+React intentionally invokes effects multiple times in development to detect side effects.
+
+Impact:
+
+Duplicate API requests and console logs appeared during development.
+
+Lesson:
+
+Repeated useEffect execution in development is expected when React StrictMode is enabled and does not occur in production builds.
