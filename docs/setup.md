@@ -285,3 +285,53 @@ Navigate Dashboard
 Outcome:
 
 Patients are automatically redirected to the dashboard after successful authentication, improving user experience.
+
+## Protected Routes
+
+Component:
+
+ProtectedRoute.jsx
+
+Purpose:
+
+Restricts access to authenticated pages.
+
+Implementation:
+
+const token = localStorage.getItem("token");
+
+if (!token) {
+    return <Navigate to="/" />;
+}
+
+return children;
+
+Flow:
+
+User Requests Protected Page
+↓
+Check JWT
+↓
+Token Exists?
+├─ Yes → Render Page
+└─ No → Redirect Login
+
+Protected Routes:
+
+- /dashboard
+
+Verification:
+
+Removed JWT from localStorage and attempted to access:
+
+/dashboard
+
+Result:
+
+Automatically redirected to:
+
+/
+
+Outcome:
+
+Unauthenticated users cannot access protected pages while authenticated users retain access.

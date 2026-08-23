@@ -174,3 +174,27 @@ app.use(cors());
 Lesson:
 
 When frontend and backend run on different origins, CORS must be configured to allow browser communication.
+
+## Bug
+
+Error:
+
+The requested module 'react-router-dom' does not provide an export named 'navigate'.
+
+Cause:
+
+Attempted to import:
+
+import { navigate } from "react-router-dom";
+
+instead of the Navigate component.
+
+Fix:
+
+Replaced with:
+
+import { Navigate } from "react-router-dom";
+
+Lesson:
+
+Navigate is a React Router component used for redirection. The navigate function is obtained through the useNavigate() hook.
