@@ -604,3 +604,103 @@ Render UI
 Outcome:
 
 All patient medical cases are rendered dynamically from backend data.
+
+## Medical Case Details Retrieval
+
+Page:
+
+MedicalCaseDetails.jsx
+
+Route:
+
+/medical-case/:caseId
+
+Authentication:
+
+Bearer JWT
+
+Purpose:
+
+Retrieve and display detailed information for a specific medical case.
+
+React Concepts:
+
+- useParams()
+- useState()
+- useEffect()
+
+Implementation:
+
+const { caseId } = useParams();
+
+const response = await api.get(
+    `/medical-case/${caseId}`,
+    {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
+
+setMedicalCase(
+    response.data.medicalCase
+);
+
+Code Explanation:
+
+useParams()
+
+→ Extracts the caseId from the URL.
+
+caseId
+
+→ Identifies which medical case should be retrieved.
+
+api.get(...)
+
+→ Sends an authenticated request to the backend.
+
+response.data.medicalCase
+
+→ Contains the requested medical case object.
+
+setMedicalCase(...)
+
+→ Stores the retrieved medical case in React state.
+
+Flow:
+
+Medical Case Card
+↓
+Select Case
+↓
+Navigate To Details Page
+↓
+Extract caseId
+↓
+Backend Request
+↓
+Medical Case Returned
+↓
+Store In State
+↓
+Render Details
+
+Verification:
+
+Successfully received:
+
+{
+    message: "Fetched medical case",
+    medicalCase: {...}
+}
+
+Successfully displayed:
+
+ACL Injury
+
+Grade 2 ACL Sprain
+
+Outcome:
+
+Patients can retrieve and view detailed information for an individual medical case.

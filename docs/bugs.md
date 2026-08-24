@@ -222,3 +222,29 @@ Duplicate API requests and console logs appeared during development.
 Lesson:
 
 Repeated useEffect execution in development is expected when React StrictMode is enabled and does not occur in production builds.
+
+## Bug
+
+Error:
+
+Medical case data was successfully fetched from the backend but did not appear on the screen.
+
+Cause:
+
+The API response was only logged using:
+
+console.log(response.data);
+
+The retrieved medical case was never stored in React state.
+
+Fix:
+
+Stored the response in state using:
+
+setMedicalCase(
+    response.data.medicalCase
+);
+
+Lesson:
+
+Fetching data alone does not update the UI. React components re-render only when state changes.
