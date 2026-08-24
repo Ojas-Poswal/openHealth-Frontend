@@ -17,6 +17,7 @@ function MedicalCaseDetails(){
                   }
               }
           )
+          console.log(response.data.medicalCase)
           setMedicalCase(response.data.medicalCase)
 
     }catch(error){
@@ -30,10 +31,28 @@ function MedicalCaseDetails(){
     return <h1>Loading...</h1>
    }
    return (
-     <>
-       <h1>{medicalCase.diagnosis}</h1>
+     <div>
+        <h1>Medical Case Details</h1>
+        <h2>{medicalCase.diagnosis}</h2>
+        <p>
+            <strong>Verdict:</strong> {medicalCase.verdict}
+        </p>
+        <p>
+            <strong>Status:</strong> {medicalCase.status}
+        </p>
+        <p>
+            <strong>Final Advice</strong> {medicalCase.finalAdvice}
+        </p>
+        <p>
+            <strong>Diagnosed At:</strong>{" "}
+            {new Date(medicalCase.diagnosedAt).toLocaleDateString()}
+        </p>
+        <p>
+            <strong>Created At:</strong>{" "}
+            {new Date(medicalCase.createdAt).toLocaleDateString()}
+        </p>
        <p>{medicalCase.verdict}</p>
-     </>
+     </div>
    )
 }
 

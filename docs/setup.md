@@ -704,3 +704,122 @@ Grade 2 ACL Sprain
 Outcome:
 
 Patients can retrieve and view detailed information for an individual medical case.
+
+## Medical Case Details Rendering
+
+Page:
+
+MedicalCaseDetails.jsx
+
+Purpose:
+
+Display detailed information about a selected medical case.
+
+React Concepts:
+
+- Conditional Rendering
+- State Rendering
+- Date Formatting
+
+Implementation:
+
+if (!medicalCase) {
+    return <h1>Loading...</h1>;
+}
+
+return (
+    <div>
+        <h1>Medical Case Details</h1>
+
+        <h2>{medicalCase.diagnosis}</h2>
+
+        <p>
+            <strong>Verdict:</strong>
+            {medicalCase.verdict}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {medicalCase.status}
+        </p>
+
+        <p>
+            <strong>Final Advice:</strong>
+            {medicalCase.finalAdvice}
+        </p>
+    </div>
+);
+
+Code Explanation:
+
+medicalCase
+
+→ Contains the medical case retrieved from the backend.
+
+Conditional Rendering
+
+→ Prevents rendering before data is available.
+
+Loading State
+
+→ Displays temporary content while waiting for the API response.
+
+State Rendering
+
+→ React automatically updates the UI when medicalCase state changes.
+
+Flow:
+
+Open Details Page
+↓
+Fetch Medical Case
+↓
+Store In State
+↓
+Re-render Component
+↓
+Display Medical Case Information
+
+Outcome:
+
+Patients can view detailed information about a selected medical case.
+
+## Date Formatting
+
+Purpose:
+
+Convert backend timestamps into a human-readable format.
+
+Implementation:
+
+new Date(
+    medicalCase.createdAt
+).toLocaleDateString()
+
+new Date(
+    medicalCase.diagnosedAt
+).toLocaleDateString()
+
+Code Explanation:
+
+new Date(...)
+
+→ Converts the ISO timestamp returned by MongoDB into a JavaScript Date object.
+
+toLocaleDateString()
+
+→ Formats the date according to the user's locale.
+
+Example:
+
+Backend:
+
+2026-08-16T14:36:17.649Z
+
+Displayed:
+
+16/08/2026
+
+Outcome:
+
+Medical case dates are displayed in a readable format for patients.
