@@ -6,6 +6,7 @@ import Sidebar from "../components/Sidebar";
 
 function Dashboard() {
   const [medicalCases, setMedicalCases] = useState([]);
+  const [searchTerm,setSearchTerm] = useState("")
 
   useEffect(() => {
     fetchMedicalCases();
@@ -29,7 +30,13 @@ function Dashboard() {
       console.error(error);
     }
   };
+  
 
+  const filteredCases = medicalCases.filter((medicalCase)=>
+    medicalCase.diagnosis
+               .toLowerCase()
+               .includes(searchTerm.toLowerCase())
+  )
   return (
     <div className="min-h-screen bg-black text-white flex">
       
@@ -44,6 +51,8 @@ function Dashboard() {
         <input
           type="text"
           placeholder="Search Cases..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 mb-6"
         />
 
@@ -72,14 +81,18 @@ function Dashboard() {
 
         </div>
 
-        <div className="space-y-6">
-          {medicalCases.map((medicalCase) => (
-            <MedicalCaseCard
-              key={medicalCase._id}
-              medicalCase={medicalCase}
-            />
-          ))}
-        </div>
+       <div className="space-y-6">
+           {filteredCases.length === 0 ? (
+               <p className="text-zinc-400 text-center"> No cases found.</p>
+               ) : (
+               filteredCases.map((medicalCase) => (
+                 <MedicalCaseCard
+                     key={medicalCase._id}
+                     medicalCase={medicalCase}
+                  />
+              ))
+            )}
+          </div>
 
       </div>
 

@@ -298,3 +298,81 @@ Lesson:
 Spacing utilities help create proper visual hierarchy and improve readability.
 
 ---
+
+# Bug Report: Medical Cases Disappeared After Search Implementation
+
+## Error
+
+Medical case cards disappeared after implementing dashboard search functionality.
+
+---
+
+## Cause
+
+The UI was rendering the filtered array:
+
+```javascript
+filteredCases
+```
+
+instead of the original:
+
+```javascript
+medicalCases
+```
+
+When the search query did not match any diagnosis values, the filtered array became empty, causing no cards to render.
+
+---
+
+## Investigation
+
+Used browser console logs to inspect:
+
+```javascript
+console.log(medicalCases);
+console.log(filteredCases);
+```
+
+Verified that:
+
+- API data was being fetched successfully.
+- Medical cases were stored correctly in state.
+- Search filtering logic was executing properly.
+
+---
+
+## Fix
+
+Implemented diagnosis-based filtering:
+
+```javascript
+const filteredCases = medicalCases.filter((medicalCase) =>
+  medicalCase.diagnosis
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase())
+);
+```
+
+Rendered:
+
+```jsx
+filteredCases.map(...)
+```
+
+instead of:
+
+```jsx
+medicalCases.map(...)
+```
+
+---
+
+## Lesson Learned
+
+When implementing search functionality:
+
+- Always verify the field being filtered.
+- Inspect API responses using console logs.
+- Confirm that the rendered array contains expected values.
+- Remember that React only displays what is returned from the current render state.

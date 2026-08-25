@@ -968,3 +968,116 @@ Outcome:
 All patient medical cases are displayed dynamically on the dashboard.
 
 ---
+
+# Dashboard Search Functionality
+
+## Overview
+
+Implemented a client-side search feature on the Dashboard page that allows patients to quickly filter and locate medical cases based on their diagnosis.
+
+---
+
+## Features
+
+- Real-time search filtering
+- Case-insensitive matching
+- Instant UI updates using React state
+- No additional API requests required
+
+---
+
+## Implementation
+
+### Search State
+
+```javascript
+const [searchTerm, setSearchTerm] = useState("");
+```
+
+Stores the text entered by the user in the search bar.
+
+---
+
+### Filter Logic
+
+```javascript
+const filteredCases = medicalCases.filter((medicalCase) =>
+  medicalCase.diagnosis
+    .toLowerCase()
+    .includes(searchTerm.toLowerCase())
+);
+```
+
+Filters all medical cases and returns only those whose diagnosis matches the entered search term.
+
+---
+
+### Search Input
+
+```jsx
+<input
+  type="text"
+  placeholder="Search Cases..."
+  value={searchTerm}
+  onChange={(e) => setSearchTerm(e.target.value)}
+/>
+```
+
+Updates the search state whenever the user types.
+
+---
+
+### Rendering Filtered Results
+
+```jsx
+{
+  filteredCases.map((medicalCase) => (
+    <MedicalCaseCard
+      key={medicalCase._id}
+      medicalCase={medicalCase}
+    />
+  ));
+}
+```
+
+Displays only the cases matching the search query.
+
+---
+
+## Flow
+
+Dashboard Loads
+
+↓
+
+Medical Cases Fetched
+
+↓
+
+Stored In State
+
+↓
+
+User Types In Search Bar
+
+↓
+
+searchTerm Updates
+
+↓
+
+filteredCases Recalculates
+
+↓
+
+Component Re-renders
+
+↓
+
+Matching Cases Displayed
+
+---
+
+## Outcome
+
+Patients can quickly search and locate specific medical cases without reloading the page or making additional backend requests.
