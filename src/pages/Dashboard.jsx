@@ -1,55 +1,90 @@
-import { useNavigate } from "react-router-dom"
-import {useState,useEffect} from "react"
-import api from "../api/axios"
+import { useState, useEffect } from "react";
+import api from "../api/axios";
+
 import MedicalCaseCard from "../components/MedicalCaseCard";
+import Sidebar from "../components/Sidebar";
 
-function Dashboard(){
-    const navigate = useNavigate();
-    const [medicalCases,setMedicalCases] = useState([])
+function Dashboard() {
+  const [medicalCases, setMedicalCases] = useState([]);
 
-    useEffect(()=>{
-        fetchMedicalCases()
-    },[])
+  useEffect(() => {
+    fetchMedicalCases();
+  }, []);
 
-    const handleLogout = () => {
-        localStorage.removeItem("token")
-        navigate("/")
-    }
+  const fetchMedicalCases = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const fetchMedicalCases = async ()=>{
-        try{
-          const token = localStorage.getItem("token")
-
-          const response = await api.get(
-            "/medical-case/my-cases",
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                
-                }
-            }
-          )
-          setMedicalCases(response.data.medicalCases)
-        }catch(error){
-            console.error(error)
+      const response = await api.get(
+        "/medical-case/my-cases",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
+      );
+
+      setMedicalCases(response.data.medicalCases);
+    } catch (error) {
+      console.error(error);
     }
+  };
 
-    return (
-        <>
-          <h1>Dashboard Page</h1>
+  return (
+    <div className="min-h-screen bg-black text-white flex">
+      
+      <Sidebar />
 
+      <div className="flex-1 p-8">
+
+        <h1 className="text-5xl font-bold mb-8">
+          Welcome Back
+        </h1>
+
+        <input
+          type="text"
+          placeholder="Search Cases..."
+          className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 mb-6"
+        />
+
+        <div className="grid grid-cols-3 gap-4 mb-10">
+
+          <div className="bg-zinc-900 p-6 rounded-2xl">
+            <h3 className="text-zinc-400">Total Cases</h3>
+            <p className="text-3xl font-bold">
+              {medicalCases.length}
+            </p>
+          </div>
+
+          <div className="bg-zinc-900 p-6 rounded-2xl">
+            <h3 className="text-zinc-400">Active Cases</h3>
+            <p className="text-3xl font-bold">
+              {medicalCases.filter(c => c.status === "active").length}
+            </p>
+          </div>
+
+          <div className="bg-zinc-900 p-6 rounded-2xl">
+            <h3 className="text-zinc-400">Reports</h3>
+            <p className="text-3xl font-bold">
+              0
+            </p>
+          </div>
+
+        </div>
+
+        <div className="space-y-6">
           {medicalCases.map((medicalCase) => (
-            <MedicalCaseCard 
-              key={medicalCase._id}  
+            <MedicalCaseCard
+              key={medicalCase._id}
               medicalCase={medicalCase}
             />
           ))}
+        </div>
 
-          <button onClick = {handleLogout}>
-            Logout
-          </button>
-        </>
-    )
+      </div>
+
+    </div>
+  );
 }
-export default Dashboard
+
+export default Dashboard;

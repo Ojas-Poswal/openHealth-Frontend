@@ -823,3 +823,148 @@ Displayed:
 Outcome:
 
 Medical case dates are displayed in a readable format for patients.
+
+## Dashboard Layout
+
+Components:
+
+- Dashboard.jsx
+- Sidebar.jsx
+- MedicalCaseCard.jsx
+
+Purpose:
+
+Create a structured dashboard interface for authenticated patients.
+
+Layout:
+
+Sidebar
+
+↓
+
+Dashboard Header
+
+↓
+
+Search Bar
+
+↓
+
+Statistics Cards
+
+↓
+
+Medical Cases List
+
+Outcome:
+
+Dashboard now provides a dedicated interface for viewing medical cases and patient information.
+
+---
+
+## Statistics Cards
+
+Purpose:
+
+Provide quick insights into patient medical data.
+
+Metrics:
+
+- Total Cases
+- Active Cases
+- Reports
+
+Implementation:
+
+{medicalCases.length}
+
+{medicalCases.filter(
+    c => c.status === "active"
+).length}
+
+Code Explanation:
+
+medicalCases.length
+
+→ Returns the total number of medical cases.
+
+filter()
+
+→ Creates a new array containing only active medical cases.
+
+length
+
+→ Counts the filtered results.
+
+Flow:
+
+Medical Cases Retrieved
+
+↓
+
+Calculate Statistics
+
+↓
+
+Render Statistics Cards
+
+↓
+
+Display Dashboard Summary
+
+Outcome:
+
+Patients can instantly view important information about their medical cases.
+
+---
+
+## Dashboard Medical Case Rendering
+
+Purpose:
+
+Render all patient medical cases dynamically using reusable components.
+
+Implementation:
+
+{medicalCases.map((medicalCase) => (
+    <MedicalCaseCard
+        key={medicalCase._id}
+        medicalCase={medicalCase}
+    />
+))}
+
+Code Explanation:
+
+map()
+
+→ Iterates through the medicalCases array.
+
+MedicalCaseCard
+
+→ Displays information for a single medical case.
+
+key
+
+→ Unique identifier used by React to efficiently update lists.
+
+Flow:
+
+Medical Cases Array
+
+↓
+
+map()
+
+↓
+
+MedicalCaseCard Components
+
+↓
+
+Rendered Dashboard
+
+Outcome:
+
+All patient medical cases are displayed dynamically on the dashboard.
+
+---

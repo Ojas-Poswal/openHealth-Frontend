@@ -248,3 +248,53 @@ setMedicalCase(
 Lesson:
 
 Fetching data alone does not update the UI. React components re-render only when state changes.
+
+## Bug
+
+Error:
+
+Medical case cards appeared outside the dashboard layout and alignment was broken.
+
+Cause:
+
+JSX div nesting was incorrect.
+
+The medical cases container was rendered outside the main dashboard content container.
+
+Fix:
+
+Moved the medical cases section inside:
+
+<div className="flex-1 p-6">
+
+and corrected the closing div hierarchy.
+
+Lesson:
+
+React layouts depend heavily on correct JSX nesting. A misplaced closing tag can break the entire page structure.
+
+---
+
+## Bug
+
+Observation:
+
+Statistics cards appeared attached directly to the search bar.
+
+Cause:
+
+No spacing existed between the search input and the statistics section.
+
+Fix:
+
+Added:
+
+mb-6
+
+to the search bar.
+
+Lesson:
+
+Spacing utilities help create proper visual hierarchy and improve readability.
+
+---
