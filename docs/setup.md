@@ -1081,3 +1081,54 @@ Matching Cases Displayed
 ## Outcome
 
 Patients can quickly search and locate specific medical cases without reloading the page or making additional backend requests.
+
+# Dashboard Improvements
+
+## Features Added
+
+- Fixed sidebar positioning
+- Sidebar remains visible while scrolling
+- Dashboard content scrolls independently
+- Implemented medical case search
+- Added empty search state
+- Added dashboard statistics cards
+
+## Search Functionality
+
+Purpose:
+Allow users to quickly find medical cases.
+
+Implementation:
+- Added search input field
+- Search updates in real time
+- Cases filtered by diagnosis
+
+Code Flow:
+
+User Types
+↓
+searchTerm State Updates
+↓
+filteredCases Recalculates
+↓
+Component Re-renders
+↓
+Matching Cases Displayed
+
+Outcome:
+Users can instantly search through their medical cases.
+
+# Expandable Medical Case Cards
+
+## Purpose
+
+Allow patients to view detailed medical information without leaving the dashboard.
+
+---
+
+## Implementation
+
+Added local state inside the MedicalCaseCard component:
+
+```javascript
+const [isOpen, setIsOpen] = useState(false);

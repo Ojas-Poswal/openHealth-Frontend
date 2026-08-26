@@ -376,3 +376,35 @@ When implementing search functionality:
 - Inspect API responses using console logs.
 - Confirm that the rendered array contains expected values.
 - Remember that React only displays what is returned from the current render state.
+
+
+### Bug
+
+```md
+## Bug
+
+Error:
+
+TypeError: toLocalDateString is not a function
+
+Cause:
+
+Incorrect JavaScript Date method name was used.
+
+Incorrect:
+
+new Date(date).toLocalDateString()
+
+Correct:
+
+new Date(date).toLocaleDateString()
+
+Fix:
+
+Replaced the invalid method with:
+
+new Date(date).toLocaleDateString()
+
+Lesson:
+
+JavaScript methods are case-sensitive and must exactly match the official API name.
