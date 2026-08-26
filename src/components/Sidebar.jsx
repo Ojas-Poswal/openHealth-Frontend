@@ -6,7 +6,7 @@ function Sidebar(){
      navigate("/")
 }
     return (
-        <div className="w-64 h-screen bg-zinc-950 border-r border-zinc-800 p-6 flex flex-col">
+        <div className="w-64 h-screen fixed left-0 top-0 bg-zinc-950 border-r border-zinc-800 p-6 flex flex-col overflow-y-auto">
          <h1 className="text-4xl font-bold mb-12">openHealth</h1>
 
          <div className="flex flex-col gap-6 text-lg">

@@ -38,11 +38,11 @@ function Dashboard() {
                .includes(searchTerm.toLowerCase())
   )
   return (
-    <div className="min-h-screen bg-black text-white flex">
+    <div className="min-h-screen bg-black text-white">
       
       <Sidebar />
 
-      <div className="flex-1 p-8">
+      <div className="ml-64 w-[calc(100%-16rem)] p-8">
 
         <h1 className="text-5xl font-bold mb-8">
           Welcome Back
