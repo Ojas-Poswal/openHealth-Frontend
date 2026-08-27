@@ -408,3 +408,175 @@ new Date(date).toLocaleDateString()
 Lesson:
 
 JavaScript methods are case-sensitive and must exactly match the official API name.
+
+# Bug Report
+
+## Bug
+
+Error:
+
+TypeError: toLocalDateString is not a function
+
+---
+
+## Cause
+
+Incorrect JavaScript Date method name was used.
+
+Incorrect:
+
+```javascript
+new Date(date).toLocalDateString()
+```
+
+Correct:
+
+```javascript
+new Date(date).toLocaleDateString()
+```
+
+---
+
+## Fix
+
+Replaced the invalid method with:
+
+```javascript
+new Date(date).toLocaleDateString()
+```
+
+---
+
+## Lesson Learned
+
+JavaScript methods are case-sensitive.
+
+Always verify method names against official documentation.
+
+---
+
+# Bug Report
+
+## Error
+
+Medical timeline page rendered a blank screen.
+
+---
+
+## Cause
+
+Timeline component referenced a variable that was never defined:
+
+```javascript
+sortedCases
+```
+
+React threw:
+
+```javascript
+ReferenceError: sortedCases is not defined
+```
+
+---
+
+## Fix
+
+Created the variable before rendering:
+
+```javascript
+const sortedCases = [...medicalCases];
+```
+
+or
+
+```javascript
+const sortedCases = filteredCases;
+```
+
+depending on implementation.
+
+---
+
+## Lesson Learned
+
+Any variable used inside JSX must exist before rendering.
+
+Undefined variables immediately break component rendering.
+
+---
+
+# Bug Report
+
+## Error
+
+Medical case cards disappeared after search implementation.
+
+---
+
+## Cause
+
+Search filtering returned an empty array when no diagnosis matched the entered text.
+
+The UI rendered:
+
+```javascript
+filteredCases
+```
+
+instead of:
+
+```javascript
+medicalCases
+```
+
+which caused all cards to disappear.
+
+---
+
+## Investigation
+
+Verified:
+
+```javascript
+console.log(medicalCases);
+console.log(filteredCases);
+```
+
+Confirmed:
+
+- API calls succeeded
+- State updated correctly
+- Filtering logic executed correctly
+
+---
+
+## Fix
+
+Implemented diagnosis-based filtering:
+
+```javascript
+const filteredCases = medicalCases.filter(
+  (medicalCase) =>
+    medicalCase.diagnosis
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase())
+);
+```
+
+Added empty-state rendering:
+
+```jsx
+{filteredCases.length === 0 ? (
+  <p>No cases found.</p>
+) : (
+  filteredCases.map(...)
+)}
+```
+
+---
+
+## Lesson Learned
+
+Always handle empty arrays when implementing search functionality.
+
+Users should receive feedback instead of a blank interface.

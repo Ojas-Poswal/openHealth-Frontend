@@ -1132,3 +1132,117 @@ Added local state inside the MedicalCaseCard component:
 
 ```javascript
 const [isOpen, setIsOpen] = useState(false);
+
+# Expandable Medical Timeline
+
+## Purpose
+
+Transform the medical case list into a timeline-style patient journey.
+
+Instead of navigating to a separate details page, users can expand and collapse medical cases directly from the dashboard.
+
+---
+
+## Features Added
+
+- Expandable medical case cards
+- Timeline visualization
+- Scrollable medical history section
+- Search compatibility maintained
+- Card click toggles details
+- Removed "View Details" button
+
+---
+
+## State Management
+
+Added local state inside MedicalCaseCard:
+
+```javascript
+const [isOpen, setIsOpen] = useState(false);
+```
+
+Purpose:
+
+- Controls whether a card is expanded
+- Stores UI state locally
+- Prevents unnecessary dashboard re-renders
+
+---
+
+## Toggle Functionality
+
+```javascript
+onClick={() => setIsOpen(!isOpen)}
+```
+
+Purpose:
+
+- Opens card on first click
+- Closes card on second click
+
+---
+
+## Conditional Rendering
+
+```jsx
+{isOpen && (
+  <div>
+    ...
+  </div>
+)}
+```
+
+Purpose:
+
+- Displays additional medical information only when expanded
+- Keeps dashboard clean and compact
+
+---
+
+## Timeline Structure
+
+```jsx
+<div className="border-l-2 border-cyan-500 pl-6">
+```
+
+Purpose:
+
+- Creates the vertical timeline line
+- Connects medical events visually
+
+---
+
+## Flow
+
+Dashboard Loads
+
+↓
+
+Medical Cases Fetched
+
+↓
+
+Timeline Rendered
+
+↓
+
+User Clicks Card
+
+↓
+
+isOpen State Updates
+
+↓
+
+Component Re-renders
+
+↓
+
+Medical Details Displayed
+
+---
+
+## Outcome
+
+Patients can explore their medical history through an interactive timeline without leaving the dashboard.

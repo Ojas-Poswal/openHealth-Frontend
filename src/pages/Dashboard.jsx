@@ -4,6 +4,8 @@ import api from "../api/axios";
 import MedicalCaseCard from "../components/MedicalCaseCard";
 import Sidebar from "../components/Sidebar";
 
+import MedicalTimeline from "../components/MedicalTimeline";
+
 function Dashboard() {
   const [medicalCases, setMedicalCases] = useState([]);
   const [searchTerm,setSearchTerm] = useState("")
@@ -81,17 +83,16 @@ function Dashboard() {
 
         </div>
 
-       <div className="space-y-6">
-           {filteredCases.length === 0 ? (
-               <p className="text-zinc-400 text-center"> No cases found.</p>
-               ) : (
-               filteredCases.map((medicalCase) => (
-                 <MedicalCaseCard
-                     key={medicalCase._id}
-                     medicalCase={medicalCase}
-                  />
-              ))
-            )}
+       <div >
+          {filteredCases.length === 0 ? (
+            <p className="text-zinc-400 text-center">
+              No Cases Found
+            </p>
+          ) : (
+            <MedicalTimeline 
+             medicalCases = {filteredCases}
+            />
+          )}
           </div>
 
       </div>
