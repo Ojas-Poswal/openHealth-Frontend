@@ -154,8 +154,8 @@ function ProfessionalDetails({ doctor, onSaved }) {
   const errors = useMemo(
     () => ({
       fullName: !form.fullName.trim() ? 'Your name is required.' : null,
-      // Not required: an account created through Google has no phone number,
-      // and demanding one here would block that account from saving anything.
+      // Not required: a doctor may have no phone number on file, and demanding
+      // one here would block them from saving anything.
       phone: null,
     }),
     [form.fullName],

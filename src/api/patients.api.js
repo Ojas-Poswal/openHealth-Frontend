@@ -20,13 +20,6 @@ export const patientsApi = {
 
   login: (payload) => publicClient.post('/patients/login', payload).then((r) => r.data),
 
-  /**
-   * Sign in with Google. `credential` is the signed token Google Identity
-   * Services hands the browser; only the backend can verify it, and it does.
-   */
-  loginWithGoogle: (credential) =>
-    publicClient.post('/patients/google', { credential }).then((r) => r.data),
-
   getProfile: () => patientClient.get('/patients/profile').then((r) => r.data.patient),
 
   updateProfile: (payload) =>

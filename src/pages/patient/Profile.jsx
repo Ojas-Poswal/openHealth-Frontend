@@ -108,7 +108,6 @@ export default function Profile() {
           />
 
           <PasswordSettings
-            patient={patient}
             onChanged={() => {
               refresh()
               profile.refetch()
@@ -174,17 +173,9 @@ function Row({ icon: Icon, label, value }) {
   )
 }
 
-/**
- * Password card.
- *
- * Two shapes, decided by `hasPassword` on the profile: an account created
- * through Google has no password yet, so it is asked for a new one only. Every
- * other account confirms the current password first.
- */
-function PasswordSettings({ patient, onChanged }) {
+/** Password card: every account confirms its current password first. */
+function PasswordSettings({ onChanged }) {
   const toast = useToast()
-
-  const hasPassword = Boolean(patient?.hasPassword)
 
   const [form, setForm] = useState({ current: '', next: '', confirm: '' })
   const [touched, setTouched] = useState(false)
@@ -192,7 +183,7 @@ function PasswordSettings({ patient, onChanged }) {
   const save = useMutation((payload) => patientsApi.changePassword(payload))
 
   const errors = {
-    current: hasPassword && !form.current ? 'Enter your current password.' : null,
+    current: !form.current ? 'Enter your current password.' : null,
     next: !form.next ? 'Choose a new password.' : null,
     confirm: form.confirm !== form.next ? 'The two passwords do not match.' : null,
   }
@@ -205,18 +196,14 @@ function PasswordSettings({ patient, onChanged }) {
     setTouched(true)
     if (!valid) return
 
-    const result = await save.run(
-      hasPassword
-        ? { oldPassword: form.current, newPassword: form.next }
-        : { newPassword: form.next },
-    )
+    const result = await save.run({ oldPassword: form.current, newPassword: form.next })
 
     if (!result) {
       toast.error(save.error?.message ?? 'Could not update your password.')
       return
     }
 
-    toast.success(hasPassword ? 'Password changed.' : 'Password set.')
+    toast.success('Password changed.')
     setForm({ current: '', next: '', confirm: '' })
     setTouched(false)
     onChanged?.()
@@ -225,35 +212,29 @@ function PasswordSettings({ patient, onChanged }) {
   return (
     <Card>
       <CardHeader
-        title={hasPassword ? 'Password' : 'Set a password'}
-        subtitle={
-          hasPassword
-            ? 'Changing this signs you out of nothing — your other devices stay signed in.'
-            : 'Your account signs in with Google. Set a password to sign in with your email as well.'
-        }
+        title="Password"
+        subtitle="Changing this signs you out of nothing — your other devices stay signed in."
         icon={KeyRound}
       />
 
       <form onSubmit={handleSubmit} className="mt-5 space-y-4">
         {save.error && <Alert tone="error">{save.error.message}</Alert>}
 
-        {hasPassword && (
-          <Field
-            label="Current password"
-            htmlFor="currentPassword"
-            required
-            error={touched ? errors.current : null}
-          >
-            <Input
-              id="currentPassword"
-              type="password"
-              autoComplete="current-password"
-              value={form.current}
-              onChange={set('current')}
-              error={touched && errors.current}
-            />
-          </Field>
-        )}
+        <Field
+          label="Current password"
+          htmlFor="currentPassword"
+          required
+          error={touched ? errors.current : null}
+        >
+          <Input
+            id="currentPassword"
+            type="password"
+            autoComplete="current-password"
+            value={form.current}
+            onChange={set('current')}
+            error={touched && errors.current}
+          />
+        </Field>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <Field
@@ -291,7 +272,7 @@ function PasswordSettings({ patient, onChanged }) {
 
         <CardFooter className="justify-end">
           <Button type="submit" icon={KeyRound} loading={save.loading} disabled={!valid && touched}>
-            {hasPassword ? 'Change password' : 'Set password'}
+            Change password
           </Button>
         </CardFooter>
       </form>
@@ -318,9 +299,8 @@ function PersonalDetails({ patient, onSaved }) {
   const errors = useMemo(
     () => ({
       fullName: !form.fullName.trim() ? 'Your name is required.' : null,
-      // A phone number is deliberately not required: an account created through
-      // Google has none, and insisting on one here would block that account
-      // from saving anything at all.
+      // A phone number is deliberately optional, so a patient without one can
+      // still save the rest of their profile.
       phone: null,
     }),
     [form.fullName],

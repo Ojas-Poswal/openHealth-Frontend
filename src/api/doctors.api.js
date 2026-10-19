@@ -19,14 +19,6 @@ export const doctorsApi = {
 
   login: (payload) => publicClient.post('/doctors/login', payload).then((r) => r.data),
 
-  /**
-   * Sign in with Google. A first-time sign-in creates the doctor record
-   * without a registration number, which is what sends them to
-   * /doctor/complete-profile before any clinical screen will open.
-   */
-  loginWithGoogle: (credential) =>
-    publicClient.post('/doctors/google', { credential }).then((r) => r.data),
-
   getProfile: () => doctorClient.get('/doctors/profile').then((r) => r.data.doctor),
 
   updateProfile: (payload) =>

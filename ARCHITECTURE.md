@@ -47,8 +47,8 @@ The backend signs **both** token flavours with the same `JWT_SECRET`:
 
 | Realm | Payload | Lifetime | Issued by |
 |---|---|---|---|
-| Patient | `{ patientID, ohid }` | 7 days | `POST /patients/login`, `POST /patients/google` |
-| Doctor | `{ doctorId, dhid }` | 7 days | `POST /doctors/login`, `POST /doctors/google` |
+| Patient | `{ patientID, ohid }` | 7 days | `POST /patients/login` |
+| Doctor | `{ doctorId, dhid }` | 7 days | `POST /doctors/login` |
 
 A patient and a doctor therefore need to be able to be signed in **in the same browser at
 the same time** — a doctor testing the app while also holding a patient account, for
@@ -87,32 +87,6 @@ no cross-talk.
 `ProtectedRoute` and `DoctorProtectedRoute` gate `/app/*` and `/doctor/*`. Each renders a
 full-page spinner while `booting` (the initial profile restore), then redirects to the
 correct login page if the session is absent.
-
-`DoctorProtectedRoute` also redirects a **signed-in doctor with no registration number**
-to `/doctor/complete-profile`. Such an account comes from `POST /doctors/google`: it
-exists and is authenticated, but the backend's `requireCompleteProfile` middleware
-refuses it every clinical route, so letting it into the shell would present a dashboard
-whose every action fails. That page passes `allowIncomplete`, which is what stops the
-redirect from pointing at itself.
-
-### Sign in with Google
-
-`GoogleSignInButton` renders Google Identity Services' own button on both sign-in
-screens. The browser receives a signed `credential`, which is posted to
-`/patients/google` or `/doctors/google`; **only the backend can verify it**, and nothing
-on the client inspects or trusts it.
-
-Three details worth keeping:
-
-- **`VITE_GOOGLE_CLIENT_ID` unset ⇒ the component renders `null`**, divider included, so
-  no screen ever shows a control that cannot work. Vite inlines the value at *build*
-  time, so a production build made without it ships with no Google button and no error.
-- **Google's iframe caps at 400px** while the sign-in column is `max-w-md` (448px), so
-  the button is centred inside a `h-12` row rather than stretched. The row is fixed
-  height because the iframe is ~40px against `Button size="lg"`'s 48px.
-- **StrictMode double-mounts the effect.** `renderButton` appends, so the component calls
-  `replaceChildren()` before every render and cancels on cleanup — otherwise development
-  shows two stacked buttons.
 
 ---
 
@@ -180,7 +154,6 @@ Every route in `src/app.js` has a client module. Nothing is unexercised.
 |---|---|---|---|
 | POST | `/register` | public | `PatientRegister` |
 | POST | `/login` | public | `PatientLogin` |
-| POST | `/google` | public | `PatientLogin` (Google credential) |
 | GET | `/profile` | patient | `AuthContext`, `Profile` |
 | PATCH | `/profile` | patient | `Profile` |
 | PATCH | `/change-password` | patient | `Profile` (change, or set a first one) |
@@ -197,21 +170,15 @@ Every route in `src/app.js` has a client module. Nothing is unexercised.
 |---|---|---|---|
 | POST | `/register` | public | `DoctorRegister` |
 | POST | `/login` | public | `DoctorLogin` |
-| POST | `/google` | public | `DoctorLogin` (Google credential) |
 | GET | `/profile` | doctor | `DoctorAuthContext`, `DoctorProfile` |
-| PATCH | `/profile` | doctor | `DoctorProfile`, `CompleteProfile` |
+| PATCH | `/profile` | doctor | `DoctorProfile` |
 | PATCH | `/change-password` | doctor | `DoctorProfile` |
-| GET | `/search/:ohid` | doctor **+ complete profile** | `SearchPatient`, doctor dashboard |
-| GET | `/patient/:patientId/timeline` | doctor + consent **+ complete profile** | `DoctorPatientTimeline` |
-| POST | `/request-consent` | doctor **+ complete profile** | `ConsentGate` |
-| POST | `/verify-consent` | doctor **+ complete profile** | `ConsentGate` |
-| POST | `/end-session` | doctor **+ complete profile** | `DoctorPatientTimeline`, `ActiveSessions` |
-| GET | `/active-sessions` | doctor **+ complete profile** | `ActiveSessions`, doctor dashboard |
-
-Every doctor route below `PATCH /profile` also carries `requireCompleteProfile`, which
-answers **403** to a doctor whose record has no `registrationNumber`. A 403 deliberately
-does not trip the client's 401 logout interceptor, so a pending doctor stays signed in
-and is simply redirected to `/doctor/complete-profile`.
+| GET | `/search/:ohid` | doctor | `SearchPatient`, doctor dashboard |
+| GET | `/patient/:patientId/timeline` | doctor + consent | `DoctorPatientTimeline` |
+| POST | `/request-consent` | doctor | `ConsentGate` |
+| POST | `/verify-consent` | doctor | `ConsentGate` |
+| POST | `/end-session` | doctor | `DoctorPatientTimeline`, `ActiveSessions` |
+| GET | `/active-sessions` | doctor | `ActiveSessions`, doctor dashboard |
 
 ### Medical cases — `/api/v1/medical-case`
 
@@ -384,12 +351,11 @@ without importing `DeathCertificate`. The certificate therefore stays `PENDING` 
 `doctor.controller.js:searchPatientByOHID` runs `Patient.findOne({ ohid })` with **no**
 `.select("-password")` (unlike the doctor middleware, which does exclude it). The response
 therefore includes the patient's bcrypt hash and every other field on the document — now
-including `googleId` and the `resetOtp` that password recovery stores, since Google
-sign-in added the former to the schema.
+including the `resetOtp` that password recovery stores.
 → `SearchPatient.jsx` renders only clinical fields — name, OHID, blood group, date of
 birth, gender, allergies — and states plainly that email and phone are not displayed.
 **The leak is in the response body regardless; this is the highest-priority backend fix.**
-The one-line fix is `.select("-password -googleId -resetOtp -resetOtpExpiry")`, which is
+The one-line fix is `.select("-password -resetOtp -resetOtpExpiry")`, which is
 also worth applying to the patient responses in `patient.controller.js`.
 
 **7.5 — The patient auth middleware's 401 path is malformed, and it logs tokens.**
@@ -518,7 +484,3 @@ Checklist that matches the contract above:
   `null` on failure instead of throwing.
 - Nothing offers an action the backend's middleware would reject.
 - Any new screen has all four states: loading, empty, error, content.
-- **Sign-in screens still work with Google unconfigured.** Unset `VITE_GOOGLE_CLIENT_ID`
-  and rebuild: the button and its divider vanish and the email form is untouched. Set it
-  and rebuild, then check the button at 320px, 375px and desktop widths — Google's iframe
-  is capped at 400px, so it must stay centred rather than overflow the column.

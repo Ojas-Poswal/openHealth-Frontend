@@ -69,7 +69,7 @@ export function DoctorAuthProvider({ children }) {
 
   /**
    * Everything that happens once the backend has answered a sign-in, shared so
-   * the Google path cannot drift from the password one.
+   * every entry point cannot drift from the others.
    */
   const startSession = useCallback(
     async (data) => {
@@ -98,11 +98,6 @@ export function DoctorAuthProvider({ children }) {
     [startSession],
   )
 
-  const loginWithGoogle = useCallback(
-    async (credential) => startSession(await doctorsApi.loginWithGoogle(credential)),
-    [startSession],
-  )
-
   const register = useCallback((payload) => doctorsApi.register(payload), [])
 
   const updateDoctor = useCallback((profile) => {
@@ -120,13 +115,12 @@ export function DoctorAuthProvider({ children }) {
       isAuthenticated: Boolean(token),
       booting,
       login,
-      loginWithGoogle,
       register,
       logout,
       refresh: loadProfile,
       updateDoctor,
     }),
-    [token, doctor, booting, login, loginWithGoogle, register, logout, loadProfile, updateDoctor],
+    [token, doctor, booting, login, register, logout, loadProfile, updateDoctor],
   )
 
   return <DoctorAuthContext.Provider value={value}>{children}</DoctorAuthContext.Provider>

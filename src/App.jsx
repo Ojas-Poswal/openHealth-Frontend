@@ -48,7 +48,6 @@ const DoctorPatientTimeline = lazy(() => import('./pages/doctor/DoctorPatientTim
 const ActiveSessions = lazy(() => import('./pages/doctor/ActiveSessions.jsx'))
 const AccessedPatients = lazy(() => import('./pages/doctor/AccessedPatients.jsx'))
 const DoctorProfile = lazy(() => import('./pages/doctor/DoctorProfile.jsx'))
-const DoctorCompleteProfile = lazy(() => import('./pages/doctor/CompleteProfile.jsx'))
 
 export default function App() {
   return (
@@ -65,18 +64,6 @@ export default function App() {
               <Route path="/doctor/login" element={<DoctorLogin />} />
               <Route path="/doctor/register" element={<DoctorRegister />} />
               <Route path="/doctor/forgot-password" element={<DoctorForgotPassword />} />
-
-              {/* Completing a Google-created doctor account. Sits outside the
-                  doctor shell on purpose — every link in that shell is refused
-                  until this is done. */}
-              <Route
-                path="/doctor/complete-profile"
-                element={
-                  <DoctorProtectedRoute allowIncomplete>
-                    <DoctorCompleteProfile />
-                  </DoctorProtectedRoute>
-                }
-              />
 
               {/* Patient area */}
               <Route
