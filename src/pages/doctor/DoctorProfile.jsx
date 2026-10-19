@@ -100,8 +100,7 @@ export default function DoctorProfile() {
 
             <CardFooter>
               <Alert tone="info">
-                Your DHID, registration number and email are set at registration and cannot be changed
-                through the API.
+                Your DHID and email are set at registration and cannot be changed through the API.
               </Alert>
             </CardFooter>
           </Card>
@@ -143,6 +142,7 @@ function ProfessionalDetails({ doctor, onSaved }) {
   const [form, setForm] = useState(() => ({
     fullName: doctor?.fullName ?? '',
     phone: doctor?.phone ?? '',
+    registrationNumber: doctor?.registrationNumber ?? '',
     qualification: doctor?.qualification ?? '',
     specialization: doctor?.specialization ?? '',
     workplace: doctor?.workplace ?? '',
@@ -154,15 +154,22 @@ function ProfessionalDetails({ doctor, onSaved }) {
   const errors = useMemo(
     () => ({
       fullName: !form.fullName.trim() ? 'Your name is required.' : null,
-      phone: !form.phone.trim() ? 'A phone number is required.' : null,
+      // Not required: an account created through Google has no phone number,
+      // and demanding one here would block that account from saving anything.
+      phone: null,
     }),
-    [form.fullName, form.phone],
+    [form.fullName],
   )
   const valid = Object.values(errors).every((value) => value === null)
 
-  const filled = ['fullName', 'phone', 'qualification', 'specialization', 'workplace'].filter(
-    (field) => Boolean(doctor?.[field]),
-  ).length
+  const filled = [
+    'fullName',
+    'phone',
+    'registrationNumber',
+    'qualification',
+    'specialization',
+    'workplace',
+  ].filter((field) => Boolean(doctor?.[field])).length
 
   const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }))
 
@@ -174,6 +181,7 @@ function ProfessionalDetails({ doctor, onSaved }) {
     const result = await save.run({
       fullName: form.fullName.trim(),
       phone: form.phone.trim(),
+      registrationNumber: form.registrationNumber.trim(),
       qualification: form.qualification.trim(),
       specialization: form.specialization.trim(),
       workplace: form.workplace.trim(),
@@ -219,8 +227,6 @@ function ProfessionalDetails({ doctor, onSaved }) {
           <Field
             label="Phone"
             htmlFor="phone"
-            required
-            error={touched ? errors.phone : null}
           >
             <Input
               id="phone"
@@ -229,6 +235,19 @@ function ProfessionalDetails({ doctor, onSaved }) {
               onChange={set('phone')}
               error={touched && errors.phone}
               autoComplete="tel"
+            />
+          </Field>
+
+          <Field
+            label="Registration number"
+            htmlFor="registrationNumber"
+            hint="As it appears on your medical council registration."
+          >
+            <Input
+              id="registrationNumber"
+              value={form.registrationNumber}
+              onChange={set('registrationNumber')}
+              placeholder="e.g. MCI-123456"
             />
           </Field>
 
@@ -271,10 +290,10 @@ function ProfessionalDetails({ doctor, onSaved }) {
         <div className="rounded-2xl border border-ink-600/60 bg-ink-800/40 p-4">
           <Meter
             value={filled}
-            max={5}
-            tone={filled === 5 ? 'mint' : 'amber'}
+            max={6}
+            tone={filled === 6 ? 'mint' : 'amber'}
             label="Profile completeness"
-            valueText={`${filled} of 5 fields`}
+            valueText={`${filled} of 6 fields`}
           />
         </div>
 

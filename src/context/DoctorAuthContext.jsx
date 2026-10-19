@@ -67,10 +67,12 @@ export function DoctorAuthProvider({ children }) {
     return () => window.removeEventListener(SESSION_EVENT, onExpired)
   }, [logout])
 
-  const login = useCallback(
-    async (credentials) => {
-      const data = await doctorsApi.login(credentials)
-
+  /**
+   * Everything that happens once the backend has answered a sign-in, shared so
+   * the Google path cannot drift from the password one.
+   */
+  const startSession = useCallback(
+    async (data) => {
       // Hold the protected routes until the profile is in hand. Without this
       // the dashboard paints first and greets the doctor without a name.
       setBooting(true)
@@ -91,6 +93,16 @@ export function DoctorAuthProvider({ children }) {
     [loadProfile],
   )
 
+  const login = useCallback(
+    async (credentials) => startSession(await doctorsApi.login(credentials)),
+    [startSession],
+  )
+
+  const loginWithGoogle = useCallback(
+    async (credential) => startSession(await doctorsApi.loginWithGoogle(credential)),
+    [startSession],
+  )
+
   const register = useCallback((payload) => doctorsApi.register(payload), [])
 
   const updateDoctor = useCallback((profile) => {
@@ -108,12 +120,13 @@ export function DoctorAuthProvider({ children }) {
       isAuthenticated: Boolean(token),
       booting,
       login,
+      loginWithGoogle,
       register,
       logout,
       refresh: loadProfile,
       updateDoctor,
     }),
-    [token, doctor, booting, login, register, logout, loadProfile, updateDoctor],
+    [token, doctor, booting, login, loginWithGoogle, register, logout, loadProfile, updateDoctor],
   )
 
   return <DoctorAuthContext.Provider value={value}>{children}</DoctorAuthContext.Provider>

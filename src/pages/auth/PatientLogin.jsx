@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { LogIn } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout.jsx'
+import GoogleSignInButton from '../../components/auth/GoogleSignInButton.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Field from '../../components/ui/Field.jsx'
 import Input from '../../components/ui/Input.jsx'
@@ -10,7 +11,7 @@ import { useAuth } from '../../context/AuthContext.jsx'
 import { useToast } from '../../context/ToastContext.jsx'
 
 export default function PatientLogin() {
-  const { login } = useAuth()
+  const { login, loginWithGoogle } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -18,6 +19,7 @@ export default function PatientLogin() {
   const [values, setValues] = useState({ email: '', password: '' })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   const set = (key) => (event) => setValues((current) => ({ ...current, [key]: event.target.value }))
 
@@ -33,6 +35,20 @@ export default function PatientLogin() {
       setError(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleGoogle = async (credential) => {
+    setError(null)
+    setGoogleLoading(true)
+    try {
+      await loginWithGoogle(credential)
+      toast.success('Welcome back.')
+      navigate(location.state?.from ?? '/app/dashboard', { replace: true })
+    } catch (err) {
+      setError(err)
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -54,6 +70,12 @@ export default function PatientLogin() {
         </>
       }
     >
+      <GoogleSignInButton
+        onCredential={handleGoogle}
+        disabled={loading || googleLoading}
+        onError={setError}
+      />
+
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {error && <Alert tone="error">{error.message}</Alert>}
 

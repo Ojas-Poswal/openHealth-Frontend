@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { Stethoscope } from 'lucide-react'
 import AuthLayout from '../../components/layout/AuthLayout.jsx'
+import GoogleSignInButton from '../../components/auth/GoogleSignInButton.jsx'
 import Button from '../../components/ui/Button.jsx'
 import Field from '../../components/ui/Field.jsx'
 import Input from '../../components/ui/Input.jsx'
@@ -10,7 +11,7 @@ import { useDoctorAuth } from '../../context/DoctorAuthContext.jsx'
 import { useToast } from '../../context/ToastContext.jsx'
 
 export default function DoctorLogin() {
-  const { login } = useDoctorAuth()
+  const { login, loginWithGoogle } = useDoctorAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const location = useLocation()
@@ -18,6 +19,7 @@ export default function DoctorLogin() {
   const [values, setValues] = useState({ email: '', password: '' })
   const [error, setError] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [googleLoading, setGoogleLoading] = useState(false)
 
   const set = (key) => (event) => setValues((current) => ({ ...current, [key]: event.target.value }))
 
@@ -33,6 +35,24 @@ export default function DoctorLogin() {
       setError(err)
     } finally {
       setLoading(false)
+    }
+  }
+
+  // A doctor signing in with Google for the first time lands here with an
+  // account that has no registration number yet. They still go to the
+  // dashboard — the route guard is what sends them on to finish setting up,
+  // so that rule lives in exactly one place.
+  const handleGoogle = async (credential) => {
+    setError(null)
+    setGoogleLoading(true)
+    try {
+      await loginWithGoogle(credential)
+      toast.success('Signed in.')
+      navigate(location.state?.from ?? '/doctor/dashboard', { replace: true })
+    } catch (err) {
+      setError(err)
+    } finally {
+      setGoogleLoading(false)
     }
   }
 
@@ -53,6 +73,12 @@ export default function DoctorLogin() {
         </>
       }
     >
+      <GoogleSignInButton
+        onCredential={handleGoogle}
+        disabled={loading || googleLoading}
+        onError={setError}
+      />
+
       <form onSubmit={handleSubmit} className="space-y-4" noValidate>
         {error && <Alert tone="error">{error.message}</Alert>}
 

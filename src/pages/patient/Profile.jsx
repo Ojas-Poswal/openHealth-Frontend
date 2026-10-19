@@ -4,6 +4,7 @@ import {
   CalendarDays,
   Check,
   Copy,
+  KeyRound,
   Mail,
   Phone,
   RotateCw,
@@ -105,6 +106,14 @@ export default function Profile() {
               profile.setData(updated)
             }}
           />
+
+          <PasswordSettings
+            patient={patient}
+            onChanged={() => {
+              refresh()
+              profile.refetch()
+            }}
+          />
         </div>
 
         <aside className="space-y-5">
@@ -165,6 +174,131 @@ function Row({ icon: Icon, label, value }) {
   )
 }
 
+/**
+ * Password card.
+ *
+ * Two shapes, decided by `hasPassword` on the profile: an account created
+ * through Google has no password yet, so it is asked for a new one only. Every
+ * other account confirms the current password first.
+ */
+function PasswordSettings({ patient, onChanged }) {
+  const toast = useToast()
+
+  const hasPassword = Boolean(patient?.hasPassword)
+
+  const [form, setForm] = useState({ current: '', next: '', confirm: '' })
+  const [touched, setTouched] = useState(false)
+
+  const save = useMutation((payload) => patientsApi.changePassword(payload))
+
+  const errors = {
+    current: hasPassword && !form.current ? 'Enter your current password.' : null,
+    next: !form.next ? 'Choose a new password.' : null,
+    confirm: form.confirm !== form.next ? 'The two passwords do not match.' : null,
+  }
+  const valid = Object.values(errors).every((value) => value === null)
+
+  const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }))
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    setTouched(true)
+    if (!valid) return
+
+    const result = await save.run(
+      hasPassword
+        ? { oldPassword: form.current, newPassword: form.next }
+        : { newPassword: form.next },
+    )
+
+    if (!result) {
+      toast.error(save.error?.message ?? 'Could not update your password.')
+      return
+    }
+
+    toast.success(hasPassword ? 'Password changed.' : 'Password set.')
+    setForm({ current: '', next: '', confirm: '' })
+    setTouched(false)
+    onChanged?.()
+  }
+
+  return (
+    <Card>
+      <CardHeader
+        title={hasPassword ? 'Password' : 'Set a password'}
+        subtitle={
+          hasPassword
+            ? 'Changing this signs you out of nothing — your other devices stay signed in.'
+            : 'Your account signs in with Google. Set a password to sign in with your email as well.'
+        }
+        icon={KeyRound}
+      />
+
+      <form onSubmit={handleSubmit} className="mt-5 space-y-4">
+        {save.error && <Alert tone="error">{save.error.message}</Alert>}
+
+        {hasPassword && (
+          <Field
+            label="Current password"
+            htmlFor="currentPassword"
+            required
+            error={touched ? errors.current : null}
+          >
+            <Input
+              id="currentPassword"
+              type="password"
+              autoComplete="current-password"
+              value={form.current}
+              onChange={set('current')}
+              error={touched && errors.current}
+            />
+          </Field>
+        )}
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="New password"
+            htmlFor="newPassword"
+            required
+            error={touched ? errors.next : null}
+          >
+            <Input
+              id="newPassword"
+              type="password"
+              autoComplete="new-password"
+              value={form.next}
+              onChange={set('next')}
+              error={touched && errors.next}
+            />
+          </Field>
+
+          <Field
+            label="Confirm new password"
+            htmlFor="confirmPassword"
+            required
+            error={touched ? errors.confirm : null}
+          >
+            <Input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              value={form.confirm}
+              onChange={set('confirm')}
+              error={touched && errors.confirm}
+            />
+          </Field>
+        </div>
+
+        <CardFooter className="justify-end">
+          <Button type="submit" icon={KeyRound} loading={save.loading} disabled={!valid && touched}>
+            {hasPassword ? 'Change password' : 'Set password'}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
+  )
+}
+
 function PersonalDetails({ patient, onSaved }) {
   const toast = useToast()
 
@@ -184,9 +318,12 @@ function PersonalDetails({ patient, onSaved }) {
   const errors = useMemo(
     () => ({
       fullName: !form.fullName.trim() ? 'Your name is required.' : null,
-      phone: !form.phone.trim() ? 'A phone number is required.' : null,
+      // A phone number is deliberately not required: an account created through
+      // Google has none, and insisting on one here would block that account
+      // from saving anything at all.
+      phone: null,
     }),
-    [form.fullName, form.phone],
+    [form.fullName],
   )
   const valid = Object.values(errors).every((value) => value === null)
 
@@ -286,8 +423,6 @@ function PersonalDetails({ patient, onSaved }) {
           <Field
             label="Phone"
             htmlFor="phone"
-            required
-            error={touched ? errors.phone : null}
             hint="Used for account recovery."
           >
             <Input

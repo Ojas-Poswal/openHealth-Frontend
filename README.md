@@ -50,6 +50,22 @@ Leave it unset for local development — the proxy handles it.
 > If your backend runs on a port other than `8000`, change `server.proxy['/api'].target`
 > in `vite.config.js`.
 
+### Google sign-in
+
+The "Continue with Google" button needs `VITE_GOOGLE_CLIENT_ID` — the OAuth 2.0 **Web**
+client ID from Google Cloud Console, with this app's exact origin under *Authorized
+JavaScript origins*:
+
+```bash
+VITE_GOOGLE_CLIENT_ID=1234567890-abcdef.apps.googleusercontent.com
+```
+
+It must match the backend's `GOOGLE_CLIENT_ID`, or every sign-in fails verification.
+`localhost` and `127.0.0.1` are **different origins** to Google — open the app on the one
+you registered. Leave it unset and the button simply does not render; the email form is
+unaffected. Vite inlines this at build time, so a production build made without it ships
+without the button and without an error.
+
 ## Scripts
 
 | Command | What it does |
